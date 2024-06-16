@@ -4,6 +4,11 @@ CREATE TABLE clientes (
     lastname VARCHAR(255) NOT NULL
 );
 
+CREATE INDEX idx_name_lastname ON clientes(name, lastname);
+
+CREATE INDEX idx_roupas_name ON roupas(name);
+
+
 CREATE TABLE roupas (
     clienteId VARCHAR(36) NOT NULL,
     name VARCHAR(255) NOT NULL,
