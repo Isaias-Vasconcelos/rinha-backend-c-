@@ -28,7 +28,7 @@ app.MapPost("/api/clientes", async ([FromBody] ClienteRequest clienteRequest) =>
 {
     clientesRequest.Add(clienteRequest);
 
-    if (clientesRequest!.Count == 1000)
+    if (clientesRequest!.Count == 5000)
     {
         await DB.ProcessData(clientesRequest);
         clientesRequest.Clear();

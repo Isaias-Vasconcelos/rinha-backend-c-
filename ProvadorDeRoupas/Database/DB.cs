@@ -7,7 +7,7 @@ namespace ProvadorDeRoupas.Database
     public class DB
     {
         const string stringConnection = "Server=127.0.0.1;Database=rinha_backend;Uid=root;Pwd=jjkeys61;";
-        public static async Task ProcessData(List<ClienteRequest> clienteRequests, int maxConcurrency = 100)
+        public static async Task ProcessData(List<ClienteRequest> clienteRequests, int maxConcurrency = 500)
         {
             using var semaphore = new SemaphoreSlim(maxConcurrency);
 
