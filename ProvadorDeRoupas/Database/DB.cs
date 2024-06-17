@@ -7,27 +7,6 @@ namespace ProvadorDeRoupas.Database
     public class DB
     {
         const string stringConnection = "Server=127.0.0.1;Database=rinha_backend;Uid=root;Pwd=jjkeys61;";
-        public static async Task ProcessData(List<ClienteRequest> clienteRequests, int maxConcurrency = 500)
-        {
-            using var semaphore = new SemaphoreSlim(maxConcurrency);
-
-            var tasks = clienteRequests.Select(async item =>
-            {
-                await semaphore.WaitAsync();
-
-                try
-                {
-                    await Insert(item);
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
-
-            await Task.WhenAll(tasks);
-        }
-
         public static async Task<IEnumerable<ClienteResponse>> ListarClientes()
         {
             using var connection = new MySqlConnection(stringConnection);
@@ -168,45 +147,6 @@ namespace ProvadorDeRoupas.Database
             }
 
             return clientes;
-        }
-        static async Task Insert(ClienteRequest clienteRequest)
-        {
-            using var connection = new MySqlConnection(stringConnection);
-
-            try
-            {
-                connection.Open();
-
-                string clienteId = Guid.NewGuid().ToString();
-
-                string insertCliente = "INSERT INTO clientes (id,name,lastname) VALUES (@Id,@Name,@LastName)";
-
-                string insertClothes = "INSERT INTO roupas (clienteId,name) VALUES (@ClienteId,@Name1),(@ClienteId,@Name2),(@ClienteId,@Name3);";
-
-                using MySqlCommand commandInsertCliente = new(insertCliente, connection);
-
-                commandInsertCliente.Parameters.AddWithValue("Id", clienteId);
-                commandInsertCliente.Parameters.AddWithValue("Name", clienteRequest.Name);
-                commandInsertCliente.Parameters.AddWithValue("LastName", clienteRequest.Lastname);
-
-                using MySqlCommand commandInsertClothes = new(insertClothes, connection);
-
-                commandInsertClothes.Parameters.AddWithValue("@ClienteId", clienteId);
-                commandInsertClothes.Parameters.AddWithValue("@Name1", clienteRequest.Clothes[0]);
-                commandInsertClothes.Parameters.AddWithValue("@Name2", clienteRequest.Clothes[1]);
-                commandInsertClothes.Parameters.AddWithValue("@Name3", clienteRequest.Clothes[2]);
-
-                await commandInsertCliente.ExecuteNonQueryAsync();
-                await commandInsertClothes.ExecuteNonQueryAsync();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            finally
-            {
-                connection.Dispose();
-            }
         }
     }
 }
